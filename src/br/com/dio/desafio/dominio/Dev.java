@@ -1,20 +1,31 @@
 package br.com.dio.desafio.dominio;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class Dev extends Conteudo{
     private String nome;
-    private Set<Conteudo> conteudoEscrito = new LinkedHashSet<>();
+    private Set<Conteudo> conteudoinscrito = new LinkedHashSet<>();
     private Set<Conteudo> conteudosConcluidos = new LinkedHashSet<>();
 
-    public void inscreverBootcamp(Bootcamp bootcamp){}
+    public void inscreverBootcamp(Bootcamp bootcamp){
+        this.conteudoinscrito.addAll(bootcamp.getConteudos());
+        bootcamp.getDevsInscritos().add(this);
+    }
 
-    public void progredir() {}
+    public void progredir() {
+        Optional<Conteudo> conteudo = this.conteudoinscrito.stream().findFirst();
+        if(conteudo.isPresent()) {
+            this.conteudosConcluidos.add(conteudo.get());
+            this.conteudoinscrito.remove(conteudo.get());
+        }
+    }
 
-    public void calcularTotalXp() {}
+    public double calcularTotalXp() {
+       return this.conteudosConcluidos
+               .stream()
+               .mapToDouble(Conteudo::calcularXp)
+               .sum();
+    }
 
     public String getNome() {
         return nome;
@@ -25,11 +36,11 @@ public class Dev extends Conteudo{
     }
 
     public Set<Conteudo> getConteudoEscrito() {
-        return conteudoEscrito;
+        return conteudoinscrito;
     }
 
     public void setConteudoEscrito(Set<Conteudo> conteudoEscrito) {
-        this.conteudoEscrito = conteudoEscrito;
+        this.conteudoinscrito= conteudoEscrito;
     }
 
     public Set<Conteudo> getConteudosConcluidos() {
@@ -45,12 +56,12 @@ public class Dev extends Conteudo{
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Dev dev = (Dev) o;
-        return Objects.equals(nome, dev.nome) && Objects.equals(conteudoEscrito, dev.conteudoEscrito) && Objects.equals(conteudosConcluidos, dev.conteudosConcluidos);
+        return Objects.equals(nome, dev.nome) && Objects.equals(conteudoinscrito, dev.conteudoinscrito) && Objects.equals(conteudosConcluidos, dev.conteudosConcluidos);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(nome, conteudoEscrito, conteudosConcluidos);
+        return Objects.hash(nome, conteudoinscrito, conteudosConcluidos);
     }
 
     @Override
